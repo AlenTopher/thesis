@@ -1,0 +1,25 @@
+{
+  "$$ClassName" : "TCastleButton",
+  "Caption" : "Button1",
+  "CustomBackgroundDisabled" : {
+    "$$ClassName" : "TCastleImagePersistent"
+  },
+  "CustomBackgroundFocused" : {
+    "$$ClassName" : "TCastleImagePersistent"
+  },
+  "CustomBackgroundNormal" : {
+    "$$ClassName" : "TCastleImagePersistent"
+  },
+  "CustomBackgroundPressed" : {
+    "$$ClassName" : "TCastleImagePersistent"
+  },
+  "Image" : {
+    "$$ClassName" : "TCastleImagePersistent"
+  },
+  "Name" : "Button1",
+  "TranslationPersistent" : {
+    "$$ClassName" : "TCastleVector2Persistent",
+    "X" : 7.2000000000000000E+002,
+    "Y" : 5.1000000000000000E+002
+  }
+}
