@@ -250,6 +250,41 @@
           "Exists" : false,
           "Gravity" : false,
           "Name" : "WalkNavigation1"
+        },
+        {
+          "$$ClassName" : "TCastleLabel",
+          "ColorPersistent" : {
+            "$$ClassName" : "TCastleColorPersistent",
+            "Blue" : 5.4901961237192154E-002,
+            "Red" : 9.9215686321258545E-001
+          },
+          "FontSize" : 2.0000000000000000E+001,
+          "Name" : "Label1",
+          "Text" : [
+            "1"
+          ],
+          "TranslationPersistent" : {
+            "$$ClassName" : "TCastleVector2Persistent",
+            "X" : 2.8000000000000000E+002,
+            "Y" : -1.5447943115234375E+002
+          },
+          "VerticalAnchorParent" : "vpTop",
+          "VerticalAnchorSelf" : "vpTop"
+        },
+        {
+          "$$ClassName" : "TCastleLabel",
+          "Exists" : false,
+          "Name" : "Label2",
+          "Text" : [
+            "Label2"
+          ],
+          "TranslationPersistent" : {
+            "$$ClassName" : "TCastleVector2Persistent",
+            "X" : 4.0000000000000000E+002,
+            "Y" : -1.5447943115234375E+002
+          },
+          "VerticalAnchorParent" : "vpTop",
+          "VerticalAnchorSelf" : "vpTop"
         }
       ],
       "InternalDesignCamera" : {
@@ -289,6 +324,27 @@
         "Exists" : false,
         "Name" : ""
       }
+    },
+    {
+      "$$ClassName" : "TCastleLabel",
+      "Alignment" : "hpRight",
+      "ColorPersistent" : {
+        "$$ClassName" : "TCastleColorPersistent",
+        "Green" : 2.3529412224888802E-002,
+        "Red" : 9.8823529481887817E-001
+      },
+      "FontSize" : 3.0000000000000000E+001,
+      "Name" : "Weapon",
+      "Text" : [
+        "Weapon"
+      ],
+      "TranslationPersistent" : {
+        "$$ClassName" : "TCastleVector2Persistent",
+        "X" : 6.0000000000000000E+001,
+        "Y" : -1.5347943115234375E+002
+      },
+      "VerticalAnchorParent" : "vpTop",
+      "VerticalAnchorSelf" : "vpTop"
     },
     {
       "$$ClassName" : "TCastleLabel",

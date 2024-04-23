@@ -7,7 +7,7 @@ unit GameViewMain;
 
 interface
 
-uses Classes, Math,
+uses Classes, Math, Crt,
   CastleVectors, CastleComponentSerialize, CastleWindow, CastleUtils,
   CastleUIControls, CastleControls, CastleKeysMouse, CastleCameras,
   CastleViewport, CastleScene, CastleSceneCore, CastleTransform, CastleSoundEngine, X3DNodes;
@@ -18,7 +18,10 @@ type
   published
     { Components designed using CGE editor.
       These fields will be automatically initialized at Start. }
+    Label1: TCastleLabel;
+    Label2: TCastleLabel;
     LabelFps: TCastleLabel;
+    Weapon: TCastleLabel;
     Viewport1: TCastleViewport;
     Camera1: TCastleCamera;
     PointLight1: TCastlePointLight;
@@ -50,23 +53,27 @@ type
          PlayerCanJump: Boolean;
          PlayerCanHit: Boolean;
          LevelComplete: Boolean;
+         PlayerCanDive: Boolean;
+         PlayerHigh: Boolean;
 
          {Enemy Restrictions}
          EnemyCanMove2: Boolean;
          EnemyCanJump: Boolean;
 
 
-         {Has Weapon}
+
+
+  public
+    EnemyHitPoints: Integer;
+    PlayerHitPoints: Integer;
+    MyInt: Integer;
+    {Has Weapon}
          HasWP0: Boolean;
          HasWP1: Boolean;
          HasWP2: Boolean;
          HasWP3: Boolean;
          HasWP4: Boolean;
 
-  public
-    EnemyHitPoints: Integer;
-    PlayerHitPoints: Integer;
-    MyInt: Integer;
     constructor Create(AOwner: TComponent); override;
     procedure Start; override;
     procedure Update(const SecondsPassed: Single; var HandleInput: Boolean); override;
@@ -93,7 +100,8 @@ end;
 procedure TViewMain.Start;
 var
   T:TVector3;
-  I, J, Wea:Integer;
+  I, J, Wea, A, C:Integer;
+  B, D: Float;
 begin
   Randomize;
   inherited;
@@ -111,21 +119,45 @@ begin
       end;
 
    {Weapon Generation}
-           for i:=0 to 4 do
+           for I:=0 to 4 do
            begin
+
            Wea := random(4);
+           writeln('Weapon' + Wea.ToString);
+           MyInt := Wea;
+           end;
+           label1.Caption := MyInt.toString;
+
            case (Wea) of
-                0: PlayerCanHit:=false;
-                1: PlayerCanHit:=true;
-                2: PlayerCanHit:=true;
-                2: PlayerCanJump:=true;
-                3: PlayerCanHit:=true;
-                4: PlayerCanHit:=true;
+                0: HasWP0:= True;
+
+                1: HasWP1:= True;
+
+                2: HasWP2:= True;
+
+                3: HasWP3:= True;
+
+                4: HasWP4:= True;
+
                 end;
 
-           end;
+        {   case (Wea) of
+                0: Weapon.Caption := 'Weapon is 0';
+                1: Weapon.Caption := 'Weapon is 1';
+                2: Weapon.Caption := 'Weapon is 2';
+                3: Weapon.Caption := 'Weapon is 3';
+                4: Weapon.Caption := 'Weapon is 4';
 
+           end;
+         }
    {Map Generation}
+   A := RandomRange(3,30);
+     Label1.Caption := 'E: ' + (A**2).ToString;
+   B := RandomRange(3, 30);
+    // Label1.Caption := 'E: ' + (B**2).ToString;
+
+   D := RandomRange(3, 25);
+      // Label2.Caption := 'Limit: ' + (D**2).ToString;
   I := Low(PlaneTransforms);
    While I < High(PlaneTransforms) do begin
          J := Low(PlaneTransforms[I]);
@@ -145,11 +177,24 @@ begin
    While J < High(WallTransforms[I]) do begin
            WallTransforms[I,J] := TCastleTransformReference.Create(Application);
      //      if abs(dopower((I-26),2) + dopower((J-26),2) - dopower(26,2)) < dopower(2.2,2) then
-           if abs(((I-26)**2) + ((J-26)**2) - (26**2)) < (4.8**2) then
+           if abs(((I-26)**2) + ((J-26)**2) - (26**2)) < (A**2) then
+              WallTransforms[I,J].Translation := Vector3(I,0,J);
+              WallTransforms[I,J].add(Wall);
+
+              C := RandomRange(3, 30);
+                 writeln();
+                 writeln('C: '+ (C**2).ToString);
+              if ((A**2) < (C ** 2)) then
+                 begin
+              Viewport1.Items.Add(WallTransforms[I,J]);
+
+                 end;
+              J += 7;
+            {if abs(((I-26)**2) + ((J-26)**2) - (26**2)) < (B**2) then
               WallTransforms[I,J].Translation := Vector3(I,0,J);
               WallTransforms[I,J].add(Wall);
               Viewport1.Items.Add(WallTransforms[I,J]);
-              J += 7;
+              J += 7; }
    end;
       I += 7;
    end;
@@ -166,6 +211,7 @@ begin
   { This virtual method is executed every frame (many times per second). }
   Assert(LabelFps <> nil, 'If you remove LabelFps from the design, remember to remove also the assignment "LabelFps.Caption := ..." from code');
   LabelFps.Caption := 'FPS: ' + Container.Fps.ToString;
+  Weapon.Caption := 'Weapon: ' + MyInt.ToString;
   //IsCollision := Player.WorldBoundingBox.Collides(Tiles.WorldBoundingBox);
 end;
 procedure TViewMain.Assign(Source: TPersistent);
@@ -200,57 +246,255 @@ begin
   begin
     // WalkNavigation1.MouseLook := not WalkNavigation1.MouseLook;
     end;
+
+  {Player Movement based on weapon}
   if Event.IsKey(keyArrowLeft) then
   begin
-    Player.Translation := Player.Translation + Vector3(-7,0,0);
-    Camera1.Translation := Camera1.Translation + Vector3(-7,0,0);
+ { if (PlayerCanJump = True and PlayerHigh = True) then
+          begin
+          Player.Translation := Player.Translation + Vector3(0,-25,0);
+          PlayerHigh := False;
+          end;   }
+       if (HasWP0 = True) then
+       begin
+            Player.Translation := Player.Translation + Vector3(-7,0,0);
+            Camera1.Translation := Camera1.Translation + Vector3(-7,0,0);
+            PlayerCanJump :=  True;
+             if (PlayerHigh = True) then
+             begin
+              Player.scale :=  Vector3(0,5,0);
+                    PlayerHigh := False;
+                 end;
+       end;
+       if (HasWP1 = True) then
+       begin
+            Player.Translation := Player.Translation + Vector3(-7,0,0);
+            Camera1.Translation := Camera1.Translation + Vector3(-7,0,0);
+       end;
+       if (HasWP2 = True) then
+       begin
+            Player.Translation := Player.Translation + Vector3(-14,0,0);
+            Camera1.Translation := Camera1.Translation + Vector3(-14,0,0);
+       end;
+       if (HasWP3 = True) then
+       begin
+            Player.Translation := Player.Translation + Vector3(-7,0,0);
+            Camera1.Translation := Camera1.Translation + Vector3(-7,0,0);
+            PlayerCanDive :=  True;
+            if (PlayerHigh = True) then
+          begin
+            Player.scale :=  Vector3(5,0,5);
+            PlayerHigh := False;
+            end;
+       end;
+       if (HasWP4 = True) then
+       begin
+            Player.Translation := Player.Translation + Vector3(-14,0,0);
+            Camera1.Translation := Camera1.Translation + Vector3(-14,0,0);
+       end;
+       {if (IsCollision = True) then
+       begin
+         If (PlayerCanHit = True)then
+
+              //Succssfull Hit an Enemey
+              EnemyHitPoints := EnemyHitPoints - 1;
+
+         else
+
+          //Player Gets Hit
+           PlayerHitPoints:= PlayerHitPoints - 1;
+
+       end;
+
+           }
+    Exit(true);
+  end;
+
+  if Event.IsKey(keyArrowRight) then
+  begin
+    {if (PlayerCanJump = True and PlayerHigh = True) then
+          begin
+          Player.Translation := Player.Translation + Vector3(0,-25,0);
+          PlayerHigh := False;
+          end;}
+    If (HasWP0 = True)then
+    begin
+    Player.Translation := Player.Translation + Vector3(7,0,0);
+    Camera1.Translation := Camera1.Translation + Vector3(7,0,0);
+      PlayerCanJump :=  True;
+      if (PlayerHigh = True) then
+      begin
+      Player.scale :=  Vector3(0,5,0);
+      PlayerHigh := False;
+      end;
+    end;
+    If (HasWP1 = True)then
+    begin
+    Player.Translation := Player.Translation + Vector3(7,0,0);
+    Camera1.Translation := Camera1.Translation + Vector3(7,0,0);
+    end;
+    If (HasWP2 = True)then
+    begin
+    Player.Translation := Player.Translation + Vector3(14,0,0);
+    Camera1.Translation := Camera1.Translation + Vector3(14,0,0);
+    PlayerCanDive :=  True;
+    if (PlayerHigh = True) then
+          begin
+            Player.scale :=  Vector3(5,0,5);
+            PlayerHigh := False;
+            end;
+    end;
+    If (HasWP3 = True)then
+    begin
+    Player.Translation := Player.Translation + Vector3(7,0,0);
+    Camera1.Translation := Camera1.Translation + Vector3(7,0,0);
+    PlayerCanDive := True;
+    if (PlayerHigh = True) then
+          begin
+            Player.scale :=  Vector3(5,0,5);
+            PlayerHigh := False;
+            end;
+    end;
+    If (HasWP4 = True)then
+    begin
+    Player.Translation := Player.Translation + Vector3(14,0,0);
+    Camera1.Translation := Camera1.Translation + Vector3(14,0,0);
+    end;
+
+    {
     if (IsCollision = True) then
        begin
          If (PlayerCanHit = True)then
             begin
                EnemyHitPoints := EnemyHitPoints - 1;
-
+            end;
+         else
+          begin
+           PlayerHitPoints:= PlayerHitPoints - 1;
+           end;
        end;
+
+     }
     Exit(true);
   end;
-  if Event.IsKey(keyArrowRight) then
+  if Event.IsKey(keyArrowDown) then
   begin
-    Player.Translation := Player.Translation + Vector3(7,0,0);
-    Camera1.Translation := Camera1.Translation + Vector3(7,0,0);
-    if (IsCollision = True) then
+  {  if (PlayerCanJump = True and PlayerHigh = True) then
+          begin
+          Player.Translation := Player.Translation + Vector3(0,-25,0);
+          PlayerHigh := False;
+          end; }
+    if (HasWP0 = True) then
        begin
-       Player.Translation := Player.Translation - Vector3(7,0,0);
-       Camera1.Translation := Camera1.Translation - Vector3(7,0,0);
+       Player.Translation := Player.Translation - Vector3(0,0,-7);
+       Camera1.Translation := Camera1.Translation - Vector3(0,0,-7);
+       PlayerCanJump :=  True;
+       if (PlayerHigh = True) then
+          begin
+          Player.scale :=  Vector3(0,5,0);
+          end;
 
+       end;
+    if (HasWP1 = True) then
+       begin
+       Player.Translation := Player.Translation - Vector3(0,0,-7);
+       Camera1.Translation := Camera1.Translation - Vector3(0,0,-7);
+       end;
+    if (HasWP2 = True) then
+       begin
+       Player.Translation := Player.Translation - Vector3(0,0,-14);
+       Camera1.Translation := Camera1.Translation - Vector3(0,0,-14);
+       PlayerCanDive :=  True;
+       if (PlayerHigh = True) then
+          begin
+            Player.scale :=  Vector3(5,0,5);
+            PlayerHigh := False;
+            end;
+       end;
+    if (HasWP3 = True) then
+       begin
+       Player.Translation := Player.Translation - Vector3(0,0,-7);
+       Camera1.Translation := Camera1.Translation - Vector3(0,0,-7);
+       end;
+    if (HasWP4 = True) then
+       begin
+       Player.Translation := Player.Translation - Vector3(0,0,-14);
+       Camera1.Translation := Camera1.Translation - Vector3(0,0,-14);
        end;
     Exit(true);
   end;
   if Event.IsKey(keyArrowUp) then
   begin
-    Player.Translation := Player.Translation + Vector3(0,0,-7);
-    Camera1.Translation := Camera1.Translation + Vector3(0,0,-7);
-    if (IsCollision = True) then
-       begin
-       Player.Translation := Player.Translation - Vector3(0,0,-7);
-       Camera1.Translation := Camera1.Translation - Vector3(0,0,-7);
-       end;
-    Exit(true);
-  end;
-  if Event.IsKey(keyArrowDown) then
-  begin
-    Player.Translation := Player.Translation + Vector3(0,0,7);
-    Camera1.Translation := Camera1.Translation + Vector3(0,0,7);
-    if (IsCollision = True) then
+   {   if (PlayerCanJump = True and PlayerHigh = True) then
+          begin
+          Player.Translation := Player.Translation + Vector3(0,-25,0);
+          PlayerHigh := False;
+          end; }
+
+    if (HasWP0 = True) then
        begin
        Player.Translation := Player.Translation - Vector3(0,0,7);
        Camera1.Translation := Camera1.Translation - Vector3(0,0,7);
+       PlayerCanJump :=  True;
+       if (PlayerHigh = True) then
+          begin
+          Player.scale :=  Vector3(0,5,0);
+          PlayerHigh := False;
+          end;
+       end;
+    if (HasWP1 = True) then
+       begin
+       Player.Translation := Player.Translation - Vector3(0,0,7);
+       Camera1.Translation := Camera1.Translation - Vector3(0,0,7);
+       end;
 
+    if (HasWP2 = True) then
+       begin
+       Player.Translation := Player.Translation - Vector3(0,0,7);
+       Camera1.Translation := Camera1.Translation - Vector3(0,0,7);
+       PlayerCanDive :=  True;
+       if (PlayerHigh = True) then
+          begin
+            Player.scale :=  Vector3(5,0,5);
+            PlayerHigh := False;
+            end;
+
+       end;
+
+    if (HasWP3 = True) then
+       begin
+       Player.Translation := Player.Translation - Vector3(0,0,7);
+       Camera1.Translation := Camera1.Translation - Vector3(0,0,7);
+       end;
+
+    if (HasWP4 = True) then
+       begin
+       Player.Translation := Player.Translation - Vector3(0,0,7);
+       Camera1.Translation := Camera1.Translation - Vector3(0,0,7);
+       PlayerCanJump :=  True;
+       if (PlayerHigh = True) then
+          begin
+          Player.scale := Player.scale - Vector3(0,5,0);
+          PlayerHigh := False;
+          end;
        end;
     Exit(true);
   end;
   if Event.IsKey(keySpace) then
      begin
-          if (PlayerCanJump
+          if (PlayerCanJump = True) then
+             begin
+              Player.scale :=  Vector3(0,5,0);
+              PlayerCanJump := False;
+              PlayerHigh := True;
+              Exit(true);
+             end;
+          if (PlayerCanDive = True) then
+             begin
+               Player.scale := Vector3(5,0,5);
+               PlayerCanDive := False;
+               PlayerHigh := True;
+               Exit(true);
      end;
   end;
 end;
