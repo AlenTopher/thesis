@@ -122,7 +122,7 @@ begin
            for I:=0 to 4 do
            begin
 
-           Wea := random(4);
+           Wea := Random(5);
            writeln('Weapon' + Wea.ToString);
            MyInt := Wea;
            end;
@@ -151,10 +151,16 @@ begin
            end;
          }
    {Map Generation}
-   A := RandomRange(3,25);
-     Label1.Caption := 'E: ' + (A**2).ToString;
-   B := RandomRange(3, 30);
-    // Label1.Caption := 'E: ' + (B**2).ToString;
+   //A for C Condition
+   // A := RandomRange(3,30);
+   //A for without C Condition
+       A := RandomRange(3, 10);
+   //    Label1.Caption := 'E: ' + (A**2).ToString;
+   //B for D Condition
+    //   B := RandomRange(3, 30);
+   //B for without D Condition
+   B := RandomRange(3, 10);
+     Label1.Caption := 'E: ' + (B**2).ToString;
 
    D := RandomRange(3, 25);
       // Label2.Caption := 'Limit: ' + (D**2).ToString;
@@ -177,24 +183,39 @@ begin
    While J < High(WallTransforms[I]) do begin
            WallTransforms[I,J] := TCastleTransformReference.Create(Application);
      //      if abs(dopower((I-26),2) + dopower((J-26),2) - dopower(26,2)) < dopower(2.2,2) then
-           if abs(((I-26)**2) + ((J-26)**2) - (26**2)) < (A**2) then
+              //Object Placement with circle equation  Integer Values
+             { if abs(((I-26)**2) + ((J-26)**2) - (26**2)) < (A**2) then
               WallTransforms[I,J].Translation := Vector3(I,0,J);
               WallTransforms[I,J].add(Wall);
-
-              C := RandomRange(3, 30);
+              //If C condition is not commented out then comment out
+              //Viewport1.Items.Add(WallTransforms[I,J]);
+              //Exception C Condition to prevent a full circle being made. For Range 0 to 30
+              {C := RandomRange(3, 30);
                  writeln();
                  writeln('C: '+ (C**2).ToString);
-              if ((A**2) > (C ** 2)) then
+
+              if ((A**2) < (C ** 2)) then
+                 begin
+              Viewport1.Items.Add(WallTransforms[I,J]);
+
+                 end;}
+              J += 7; }
+
+              //Object Placement with circle equation Float Values
+            if abs(((I-26)**2) + ((J-26)**2) - (26**2)) < (B**2) then
+              WallTransforms[I,J].Translation := Vector3(I,0,J);
+              WallTransforms[I,J].add(Wall);
+              //Viewport1.Items.Add(WallTransforms[I,J]);
+              //Exception D Condition to prevent a full circle being made. For Range 0 to 30
+              D :=RandomRange(3,30);
+              writeln();
+              writeln('D: ' + (D**2).ToString);
+            if ((B**2) < (D ** 2)) then
                  begin
               Viewport1.Items.Add(WallTransforms[I,J]);
 
                  end;
               J += 7;
-            {if abs(((I-26)**2) + ((J-26)**2) - (26**2)) < (B**2) then
-              WallTransforms[I,J].Translation := Vector3(I,0,J);
-              WallTransforms[I,J].add(Wall);
-              Viewport1.Items.Add(WallTransforms[I,J]);
-              J += 7; }
    end;
       I += 7;
    end;
